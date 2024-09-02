@@ -2,7 +2,6 @@
  * Nome: Gustavo Purcena de Lima
  * RA: 198594
  * Turma: A
- *  gcc -Wall -o simpleshell simpleshell.c
 */
 
 #include <stdio.h>
@@ -14,7 +13,7 @@
 #define MAX_PATH 1024
 #define MAX_ARGS 64
 
-void execute_command(char *command, char *dirs[], int dir_count) {
+void execute_command(char *command, char *dirs[], int dir_count, int background) {
     char *args[MAX_ARGS];
     int arg_count = 0;
     char *token = strtok(command, " ");
@@ -45,13 +44,15 @@ void execute_command(char *command, char *dirs[], int dir_count) {
             exit(1);
         } else if (pid > 0) {
             // Parent process
-            int status;
-            waitpid(pid, &status, 0);
+            if (!background) {
+                int status;
+                waitpid(pid, &status, 0);
+            }
         } else {
             perror("fork");
         }
     } else {
-        printf("Error: Process '%s' does not exist in specified dirs.\n", args[0]);
+        printf("Comando não encontrado.\n");
     }
 }
 
@@ -71,13 +72,33 @@ int main(int argc, char *argv[]) {
     }
 
     char command[MAX_PATH];
-    printf("simple-shell$: ");
-    if (fgets(command, sizeof(command), stdin) == NULL) {
-        return 0;
-    }
-    command[strcspn(command, "\n")] = 0;
+    while (1) {
+        printf("simpleshell$: ");
+        if (fgets(command, sizeof(command), stdin) == NULL) {
+            break;
+        }
+        command[strcspn(command, "\n")] = 0;
 
-    execute_command(command, dirs, dir_count);
+        if (strlen(command) == 0) {
+            continue;
+        }
+
+        if (strcmp(command, "exit") == 0) {
+            break;
+        }
+
+        int background = 0;
+        if (command[strlen(command) - 1] == '&') {
+            background = 1;
+            command[strlen(command) - 1] = '\0';
+            // Remove trailing spaces after removing '&'
+            while (command[strlen(command) - 1] == ' ') {
+                command[strlen(command) - 1] = '\0';
+            }
+        }
+
+        execute_command(command, dirs, dir_count, background);
+    }
 
     return 0;
 }
