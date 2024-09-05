@@ -1,5 +1,18 @@
+# Ignore everything
+*
+
+# But not these files...
+!*.c
+!*.h
+!.gitignore
+!README.md
+
+# ...even if they are in subdirectories
+!*/
+
+# Ignore specific files
 settings.json
-pdfs/*
 .DS_Store
-**/*
-**/!*.*
+
+# Ignore all files in the pdfs directory
+pdfs/*
