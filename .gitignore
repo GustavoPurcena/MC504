@@ -7,6 +7,7 @@
 !*.asm
 !.gitignore
 !README.md
+!*.png
 
 # ...even if they are in subdirectories
 !*/
